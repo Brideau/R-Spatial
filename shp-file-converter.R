@@ -1,18 +1,18 @@
 library(rgdal)
+
 dir <- 'Places' # Directory of the shp file
 file <- '1M_Place_Names_2009' # Name of the shp file
-
-if (!file.exists(paste(dir, 'Converted', sep="/"))) {
-  dir.create(paste(dir, '/Converted', sep="/"))
-}
-
 # "Multi": save in multiple parts. "Single": just one.
 saveAs <- "Multi"
 includeCoords <- "Y" # Y/N
 external.name.file <- "N" # Y/N
-
 # To see what outputs types are available, execute orgDrivers()
 outputType <- "CSV"
+dropCols <- c("UID_V6", "NOM_FR", "CAPITAL", "CGNS_FID", "TYPE_NAME", "PROV_FR", "POP_SOURCE", "SCALE")
+
+if (!file.exists(paste(dir, 'Converted', sep="/"))) {
+  dir.create(paste(dir, '/Converted', sep="/"))
+}
 
 if (external.name.file == "Y") {
   # Inputs a file that has names and corresponding number key
@@ -22,6 +22,7 @@ if (external.name.file == "Y") {
 
 # Reads the shapefile and stores it in a SpatialPolygonDataFrame
 polygon <- readOGR(dsn=dir, layer=file)
+polygon@data <- polygon@data[,!(names(polygon@data) %in% dropCols)]
 
 if (saveAs == "Multi") {
   # Splits the file up by KEYWORD and saves them as separate files
