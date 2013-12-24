@@ -8,7 +8,10 @@ includeCoords <- "Y" # Y/N
 external.name.file <- "N" # Y/N
 # To see what outputs types are available, execute orgDrivers()
 outputType <- "CSV"
+# Which columns should be dropped from the imported polygon?
 dropCols <- c("UID_V6", "NOM_FR", "CAPITAL", "CGNS_FID", "TYPE_NAME", "PROV_FR", "POP_SOURCE", "SCALE")
+# What dataframe column do you want to split the file output by? (Must be a factor)
+splitFactor <- "PROV_EN"
 
 if (!file.exists(paste(dir, 'Converted', sep="/"))) {
   dir.create(paste(dir, '/Converted', sep="/"))
@@ -26,20 +29,20 @@ polygon@data <- polygon@data[,!(names(polygon@data) %in% dropCols)]
 
 if (saveAs == "Multi") {
   # Splits the file up by KEYWORD and saves them as separate files
-  for (i in 1:length(levels(polygon$PROV_EN))) {
+  for (i in 1:length(levels(polygon[[splitFactor]]))) {
     
     if (external.name.file == "Y") {
       # Grabs the key for each subset, saves it in name, and
       # then replaces the key with the readable name
-      name.key <- as.integer(levels(polygon$PROV_EN)[i])
+      name.key <- as.integer(levels(polygon[[splitFactor]])[i])
       name <- names[names$KEY==name.key,'ENG_NAME']
-      levels(polygon$PROV_EN)[i] <- name
+      levels(polygon[[splitFactor]])[i] <- name
     } else {
-      name <- levels(polygon$PROV_EN)[i]
+      name <- levels(polygon[[splitFactor]])[i]
     }
     
     # Grabs each subset
-    subset <- subset(polygon, polygon$PROV_EN==name)
+    subset <- subset(polygon, polygon[[splitFactor]]==name)
     subsetWGS <- spTransform(subset, CRS("+proj=longlat +ellps=WGS84 +datum=WGS84"))
     
     if (includeCoords == "Y") {
