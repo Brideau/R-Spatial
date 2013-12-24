@@ -7,8 +7,8 @@ if (!file.exists(paste(dir, 'Converted', sep="/"))) {
 }
 
 # "Multi": save in multiple parts. "Single": just one.
-saveAs <- "Multi"
-slotSplit <- "PROV_EN" # Only necessary if using Multi
+saveAs <- "Single"
+includeCoords <- "Y" # Y/N
 external.name.file <- "N" # Y/N
 
 # To see what outputs types are available, execute orgDrivers()
@@ -57,6 +57,12 @@ if (saveAs == "Multi") {
     }
 
     polygonWGS <- spTransform(polygon, CRS("+proj=longlat +ellps=WGS84 +datum=WGS84"))
+    
+    if (includeCoords == "Y") {
+      polygonWGS@data$LONGITUDE <- polygonWGS@coords[,1]
+      polygonWGS@data$LATITUDE <- polygonWGS@coords[,2]
+    }
+    
     output.name <-  paste(dir, "/", file, ".", tolower(outputType), sep="")
     writeOGR(polygonWGS, dsn=output.name, layer="Layer", driver=outputType)
 }
