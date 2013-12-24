@@ -7,7 +7,7 @@ if (!file.exists(paste(dir, 'Converted', sep="/"))) {
 }
 
 # "Multi": save in multiple parts. "Single": just one.
-saveAs <- "Single"
+saveAs <- "Multi"
 includeCoords <- "Y" # Y/N
 external.name.file <- "N" # Y/N
 
@@ -40,6 +40,11 @@ if (saveAs == "Multi") {
     # Grabs each subset
     subset <- subset(polygon, polygon$PROV_EN==name)
     subsetWGS <- spTransform(subset, CRS("+proj=longlat +ellps=WGS84 +datum=WGS84"))
+    
+    if (includeCoords == "Y") {
+      subsetWGS@data$LONGITUDE <- subsetWGS@coords[,1]
+      subsetWGS@data$LATITUDE <- subsetWGS@coords[,2]
+    }
     
     # Save each subset as a separate file
     output.name <- paste(dir, "/Converted/", name, ".", tolower(outputType), sep="")
