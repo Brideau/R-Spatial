@@ -48,7 +48,8 @@ if (saveAs == "Multi") {
     }
     
     # Save each subset as a separate file
-    output.name <- paste(dir, "/Converted/", name, ".", tolower(outputType), sep="")
+    file.name <- gsub(" ", "", name, fixed=TRUE)
+    output.name <- paste(dir, "/Converted/", file.name, ".", tolower(outputType), sep="")
     writeOGR(subsetWGS, dsn=output.name, layer=name, driver=outputType)
   }
 } else {
